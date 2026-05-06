@@ -66,7 +66,7 @@ WSGI_APPLICATION = 'farmapp_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'FarmApp-bd',
+        'NAME': 'FarmApp',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
