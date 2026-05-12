@@ -1,0 +1,76 @@
+{% extends "farm/base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Оперативная сводка</h1>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+    <div class="col">
+        <div class="card h-100 shadow-sm border-primary border-start border-4">
+            <div class="card-body">
+                <h6 class="card-title text-muted text-uppercase small">Поголовье</h6>
+                <p class="h3 mb-0">{{ animals_count }} особей</p>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> +2 в этом месяце</small>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm border-success border-start border-4">
+            <div class="card-body">
+                <h6 class="card-title text-muted text-uppercase small">Землепользование</h6>
+                <p class="h3 mb-0">{{ total_area }} га</p>
+                <small class="text-muted">Занято под посев: 86%</small>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm border-warning border-start border-4">
+            <div class="card-body">
+                <h6 class="card-title text-muted text-uppercase small">Критический склад</h6>
+                <p class="h3 mb-0 text-danger">{{ low_stock_count }} поз.</p>
+                <small class="text-muted">Требуется закупка кормов</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card shadow-sm">
+    <div class="card-header bg-transparent fw-bold">
+        <i class="bi bi-clock-history me-2"></i>Последние ветеринарные мероприятия
+    </div>
+    <div class="table-responsive p-3">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Дата</th>
+                    <th>Животное</th>
+                    <th>Мероприятие/Диагноз</th>
+                    <th>Затраты</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for op in latest_operations %}
+                <tr>
+                    <td>{{ op.data|date:"d.m.Y" }}</td>
+                    <td>
+                        <span class="badge bg-secondary">#{{ op.animal.inventory_number }}</span>
+                        {{ op.animal.species.name }}
+                    </td>
+                    <td>{{ op.description|truncatechars:50 }}</td>
+                    <td>{{ op.cost }} ₽</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-3">Записей пока нет</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-transparent text-end">
+        <a href="#" class="btn btn-sm btn-outline-primary">Весь журнал</a>
+    </div>
+</div>
+{% endblock %}
