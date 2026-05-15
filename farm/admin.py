@@ -1,15 +1,12 @@
 from django.contrib import admin
-from .models import Employee, Species, Animal, VeterinaryLog, Field, Storage, CropRotation
+from farmapp_project.settings import AUTH_USER_MODEL
+from .models import Species, Animal, VeterinaryLog, Field, Storage, CropRotation
+
 
 admin.site.site_header = "Панель управления FarmApp"
 admin.site.site_title = "FarmApp Админ"
 admin.site.index_title = "Управление сельскохозяйственным предприятием"
 
-@admin.register(Employee)
-class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'position', 'phone')
-    search_fields = ('full_name', 'position')
-    list_filter = ('position',)
 
 @admin.register(Species)
 class SpeciesAdmin(admin.ModelAdmin):

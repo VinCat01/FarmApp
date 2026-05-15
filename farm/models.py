@@ -1,18 +1,5 @@
+from django.conf import settings
 from django.db import models
-
-
-class Employee(models.Model):
-    full_name = models.CharField(max_length=255, verbose_name='ФИО')
-    position = models.CharField(max_length=100, verbose_name='Должность')
-    phone = models.CharField(max_length=20,verbose_name='Телефон',blank=True)
-
-    def __str__(self):
-        return f"{self.full_name} ({self.position})"
-
-    class Meta:
-        verbose_name ="Сотрудник"
-        verbose_name_plural = "Сотрудники"
-
 
 
 class Species(models.Model):
@@ -39,7 +26,7 @@ class Animal(models.Model):
     birth_date = models.DateField(verbose_name="Дата рождения")
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name="Пол")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, verbose_name="Статус")
-    responsible_person = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, verbose_name="Ответственный")
+    responsible_person = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Ответственный")
 
     def __str__(self):
         return f"{self.inventory_number} ({self.species.name})"

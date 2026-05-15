@@ -8,10 +8,18 @@
 
     <div class="navbar-nav w-100 d-flex flex-row justify-content-end align-items-center px-3">
         <div class="nav-item text-nowrap text-white me-3">
-            <small class="text-muted">Роль: Администратор</small> | <strong>Дятьков Д.А.</strong>
+            {% if request.user.is_authenticated %}
+            <small class="text-muted">Роль: Администратор</small> | <strong>{{ request.user.username }}</strong>
+            {% else %}
+            <p>Привет, Гость!</p>
+            {% endif %}
         </div>
-        <div class="nav-item text-nowrap">
-            <a class="nav-link px-3 btn btn-outline-danger btn-sm text-white" href="/admin/logout/">Выход</a>
-        </div>
+
+            <div class="nav-item text-nowrap">
+                <form  action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+                <button type="submit" class="nav-link px-3 btn btn-outline-danger btn-sm text-white">Выход</button>
+                </form>
+            </div>
     </div>
 </header>
