@@ -1,0 +1,149 @@
+﻿{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | FarmApp{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary: #198754;
+        --secondary: #157347;
+        --accent: #20c997;
+        --primary-fg: #fff;
+        --body-fg: #333;
+        --body-bg: #f8f9fa;
+        --body-quiet-color: #666;
+        --body-loud-color: #000;
+        --header-color: #fff;
+        --header-branding-color: #fff;
+        --header-bg: #198754;
+        --header-link-color: #fff;
+        --breadcrumbs-fg: #c4e3d3;
+        --breadcrumbs-bg: #157347;
+        --link-fg: #198754;
+        --link-hover-color: #20c997;
+        --link-selected-fg: #198754;
+        --hairline-color: #dee2e6;
+        --border-color: #ccc;
+        --error-fg: #dc3545;
+        --message-success-bg: #d1e7dd;
+        --message-warning-bg: #fff3cd;
+        --message-error-bg: #f8d7da;
+        --darkened-bg: #e9ecef;
+        --selected-bg: #d1e7dd;
+        --selected-row: #d1e7dd;
+        --button-fg: #fff;
+        --button-bg: #198754;
+        --button-hover-bg: #157347;
+        --default-button-bg: #198754;
+        --default-button-hover-bg: #157347;
+        --close-button-bg: #6c757d;
+        --close-button-hover-bg: #5c636a;
+        --delete-button-bg: #dc3545;
+        --delete-button-hover-bg: #bb2d3b;
+        --object-tools-fg: #fff;
+        --object-tools-bg: #198754;
+        --object-tools-hover-bg: #157347;
+    }
+
+    #header {
+        background: var(--header-bg);
+        color: var(--header-color);
+        border-bottom: 3px solid var(--accent);
+    }
+
+    #branding h1 {
+        color: var(--header-branding-color);
+        font-weight: 300;
+    }
+
+    #branding h1 a:link, #branding h1 a:visited {
+        color: var(--header-branding-color);
+    }
+
+    #user-tools a {
+        color: var(--header-link-color);
+        border-bottom: none;
+    }
+
+    #user-tools a:focus, #user-tools a:hover {
+        color: var(--accent);
+        text-decoration: underline;
+    }
+
+    div.breadcrumbs {
+        background: var(--breadcrumbs-bg);
+        color: var(--breadcrumbs-fg);
+    }
+
+    div.breadcrumbs a {
+        color: var(--breadcrumbs-fg);
+    }
+
+    .module h2, .module caption, .inline-group h2 {
+        background: var(--primary);
+        color: var(--primary-fg);
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: var(--button-bg);
+        color: var(--button-fg);
+    }
+
+    .button:active, input[type=submit]:active, input[type=button]:active, .button:focus, input[type=submit]:focus, input[type=button]:focus {
+        background: var(--button-hover-bg);
+    }
+
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: var(--default-button-bg);
+    }
+
+    .button.default:active, input[type=submit].default:active {
+        background: var(--default-button-hover-bg);
+    }
+
+    .selector-chosen h2 {
+        background: var(--primary);
+    }
+
+    a.section:link, a.section:visited {
+        color: var(--primary-fg);
+    }
+
+    .dashboard #content {
+        width: 90%;
+        max-width: 1200px;
+    }
+
+    .dashboard .module table th {
+        width: 100%;
+    }
+
+    .aligned label {
+        font-weight: 500;
+    }
+
+    .form-row {
+        padding: 8px 0;
+    }
+
+    .help, p.help, p.timezonewarning {
+        font-size: 11px;
+        color: var(--body-quiet-color);
+    }
+
+    .field-box {
+        margin-right: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        🌿 FarmApp — Цифровая ферма
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

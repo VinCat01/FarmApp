@@ -1,4 +1,4 @@
-
+﻿
 
 from pathlib import Path
 
@@ -46,13 +46,14 @@ ROOT_URLCONF = 'farmapp_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'farm' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'users.context_processors.user_role',
             ],
         },
     },
@@ -71,7 +72,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
-        'PORT': 5432,
+        'PORT': 7777,
     'DISABLE_SERVER_SIDE_CURSORS': True,
     }
 }

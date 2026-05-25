@@ -1,25 +1,41 @@
-<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+﻿{% load static %}
+<header class="navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow" style="background: #198754;">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="{% url 'index' %}">
-        <i class="bi bi-moisture me-2"></i> Цифровая ферма
+        <i class="bi bi-moisture me-2"></i> FarmApp — Цифровая ферма
     </a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="navbar-nav w-100 d-flex flex-row justify-content-end align-items-center px-3">
-        <div class="nav-item text-nowrap text-white me-3">
-            {% if request.user.is_authenticated %}
-            <small class="text-muted">Роль: Администратор</small> | <strong>{{ request.user.username }}</strong>
-            {% else %}
-            <p>Привет, Гость!</p>
+        {% if request.user.is_authenticated %}
+        <div class="nav-item text-nowrap text-white me-3 d-flex align-items-center gap-2">
+            <i class="bi bi-person-circle"></i>
+            <strong>{{ request.user.full_name|default:request.user.username }}</strong>
+
+            {% if user_role == "worker" %}
+            <span class="role-badge badge-worker">Работник</span>
+            {% elif user_role == "manager" %}
+            <span class="role-badge badge-manager">Менеджер</span>
+            {% elif user_role == "admin" %}
+            <span class="role-badge badge-admin">Администратор</span>
             {% endif %}
         </div>
 
-            <div class="nav-item text-nowrap">
-                <form  action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-                <button type="submit" class="nav-link px-3 btn btn-outline-danger btn-sm text-white">Выход</button>
-                </form>
-            </div>
+        <div class="nav-item text-nowrap">
+            <form action="{% url 'logout' %}" method="post" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="nav-link px-3 btn btn-outline-light btn-sm" style="border-color: rgba(255,255,255,0.3);">
+                    <i class="bi bi-box-arrow-right"></i> Выйти
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="nav-item text-nowrap">
+            <a href="{% url 'login' %}" class="nav-link px-3 btn btn-outline-light btn-sm" style="border-color: rgba(255,255,255,0.3);">
+                <i class="bi bi-box-arrow-in-right"></i> Войти
+            </a>
+        </div>
+        {% endif %}
     </div>
 </header>
