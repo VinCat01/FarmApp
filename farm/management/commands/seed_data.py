@@ -1,4 +1,4 @@
-﻿"""Кастомная команда для заполнения БД тестовыми данными."""
+﻿
 from django.core.management.base import BaseCommand
 from datetime import date, timedelta
 import random
@@ -6,26 +6,11 @@ import random
 from farm.models import Species, Animal, Field, Storage, CropRotation, VeterinaryLog
 from users.models import CustomUser
 
-
 class Command(BaseCommand):
     help = "Заполняет базу данных тестовыми данными"
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS("Начинаем заполнение БД тестовыми данными..."))
-
-        # 1. Создаём тестового пользователя
-        if not CustomUser.objects.filter(username="admin").exists():
-            user = CustomUser.objects.create_superuser(
-                username="admin",
-                password="admin123",
-                full_name="Иван Петров",
-                phone="+7-999-111-22-33",
-                position="Главный агроном",
-            )
-            self.stdout.write(f"  Создан пользователь: {user.username}")
-        else:
-            user = CustomUser.objects.get(username="admin")
-            self.stdout.write(f"  Пользователь уже существует: {user.username}")
 
         # 2. Виды животных
         species_data = [

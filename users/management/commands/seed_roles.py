@@ -45,7 +45,7 @@ class Command(BaseCommand):
         users_data = [
             {
                 "username": "admin",
-                "password": "Admin_2024_Farm!",
+                "password": "VindovCat",
                 "full_name": "Главный Администратор",
                 "phone": "+7-999-000-00-01",
                 "position": "Администратор системы",
@@ -54,10 +54,10 @@ class Command(BaseCommand):
                 "is_staff": True,
             },
             {
-                "username": "ivan_worker",
-                "password": "Worker_2024_Farm!",
+                "username": "Vindov.cat",
+                "password": "VinCat123",
                 "full_name": "Иван Петров",
-                "phone": "+7-999-111-22-33",
+                "phone": "+7-939-142-22-33",
                 "position": "Разнорабочий",
                 "role_codename": "worker",
                 "is_superuser": False,
@@ -65,7 +65,7 @@ class Command(BaseCommand):
             },
             {
                 "username": "anna_manager",
-                "password": "Manager_2024_Farm!",
+                "password": "ManagerAS",
                 "full_name": "Анна Смирнова",
                 "phone": "+7-999-444-55-66",
                 "position": "Зоотехник",
@@ -124,6 +124,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Готово! Все роли и пользователи созданы."))
         self.stdout.write("")
         self.stdout.write("Тестовые учётные данные:")
-        self.stdout.write("  Администратор: admin / Admin_2024_Farm!")
-        self.stdout.write("  Работник:       ivan_worker / Worker_2024_Farm!")
-        self.stdout.write("  Менеджер:       anna_manager / Manager_2024_Farm!")
+        self.stdout.write("  Администратор: admin / VindovCat")
+        self.stdout.write("  Работник:       Vindov.cat / VinCat123")
+        self.stdout.write("  Менеджер:       anna_manager / ManagerAS")

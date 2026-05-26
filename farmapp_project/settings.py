@@ -72,7 +72,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
-        'PORT': 7777,
+        'PORT': 5432,
     'DISABLE_SERVER_SIDE_CURSORS': True,
     }
 }
