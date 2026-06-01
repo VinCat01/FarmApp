@@ -12,7 +12,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS("Начинаем заполнение БД тестовыми данными..."))
 
-        # 2. Виды животных
         species_data = [
             "Крупный рогатый скот",
             "Свиньи",
@@ -29,7 +28,6 @@ class Command(BaseCommand):
                 self.stdout.write(f"  Добавлен вид: {name}")
         self.stdout.write(f"  Виды животных: {len(species_data)} шт.")
 
-        # 3. Животные (15 шт.)
         if Animal.objects.count() < 10:
             for i in range(15):
                 gender = random.choice(["M", "F"])
@@ -52,7 +50,6 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"  Животные уже есть: {Animal.objects.count()} шт.")
 
-        # 4. Поля
         field_data = [
             ("90:01:000001:100", 50.5, "free"),
             ("90:01:000001:101", 120.0, "occupied"),
@@ -68,7 +65,6 @@ class Command(BaseCommand):
             )
         self.stdout.write(f"  Добавлено полей: {Field.objects.count()}")
 
-        # 5. Склад
         storage_items = [
             ("Пшеница озимая", "seed", 5000, "кг"),
             ("Ячмень яровой", "seed", 3000, "кг"),
@@ -93,7 +89,6 @@ class Command(BaseCommand):
             )
         self.stdout.write(f"  Добавлено позиций на склад: {Storage.objects.count()}")
 
-        # 6. Севооборот
         if CropRotation.objects.count() < 3:
             fields_occupied = Field.objects.filter(status="occupied")
             seeds = Storage.objects.filter(item_type="seed")
@@ -111,7 +106,6 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"  Севооборот уже есть: {CropRotation.objects.count()}")
 
-        # 7. Ветеринарный журнал
         if VeterinaryLog.objects.count() < 5:
             descriptions = [
                 "Плановый осмотр, состояние удовлетворительное",

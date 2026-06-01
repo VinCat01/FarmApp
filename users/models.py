@@ -48,7 +48,6 @@ class CustomUser(AbstractUser):
         return self.get_role_display() if not self.role else self.role.name
 
     def has_role(self, codename):
-        """Проверка наличия роли по кодовому имени"""
         return self.role and self.role.codename == codename
 
     def is_worker(self):

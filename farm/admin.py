@@ -10,14 +10,11 @@ admin.site.site_title = "FarmApp Администрирование"
 admin.site.index_title = "Добро пожаловать в систему управления фермой"
 
 
-# === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
 def link_to_model(obj, field_name="__str__"):
-    """Создаёт HTML-ссылку на объект в админке"""
     url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
     return mark_safe(f'<a href="{url}">{getattr(obj, field_name)}</a>')
 
 
-# === SPECIES ===
 @admin.register(Species)
 class SpeciesAdmin(admin.ModelAdmin):
     list_display = ("name", "animal_count")
@@ -31,7 +28,6 @@ class SpeciesAdmin(admin.ModelAdmin):
         return obj.animal_count
 
 
-# === ANIMAL ===
 @admin.register(Animal)
 class AnimalAdmin(admin.ModelAdmin):
     list_display = (
@@ -84,7 +80,6 @@ class AnimalAdmin(admin.ModelAdmin):
         return f"{months}мес"
 
 
-# === VETERINARY LOG ===
 @admin.register(VeterinaryLog)
 class VeterinaryLogAdmin(admin.ModelAdmin):
     list_display = ("animal_link", "data", "short_description", "cost_display")
@@ -105,7 +100,6 @@ class VeterinaryLogAdmin(admin.ModelAdmin):
         return mark_safe(f'<strong>{obj.cost} ₽</strong>')
 
 
-# === FIELD ===
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
     list_display = ("cadastral_number", "area_display", "status_colored", "crop_count")
@@ -130,7 +124,6 @@ class FieldAdmin(admin.ModelAdmin):
         return obj.crop_count
 
 
-# === STORAGE ===
 @admin.register(Storage)
 class StorageAdmin(admin.ModelAdmin):
     list_display = ("name", "item_type_colored", "quantity_display", "unit", "low_stock_warning")
@@ -162,7 +155,6 @@ class StorageAdmin(admin.ModelAdmin):
         return mark_safe('<span style="color: green;">✓ В норме</span>')
 
 
-# === CROP ROTATION ===
 @admin.register(CropRotation)
 class CropRotationAdmin(admin.ModelAdmin):
     list_display = ("field_link", "crop_link", "planting_date", "harvest_planned", "days_until_harvest")

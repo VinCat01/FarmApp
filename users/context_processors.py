@@ -1,5 +1,4 @@
 ﻿def user_role(request):
-    """Добавляет информацию о роли пользователя в контекст шаблонов"""
     if not request.user.is_authenticated:
         return {
             "user_role": None,

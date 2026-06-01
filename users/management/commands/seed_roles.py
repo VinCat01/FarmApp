@@ -1,5 +1,4 @@
-﻿"""Команда для создания базовых ролей и тестовых пользователей."""
-from django.core.management.base import BaseCommand
+﻿from django.core.management.base import BaseCommand
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from users.models import Role, CustomUser
@@ -9,7 +8,6 @@ class Command(BaseCommand):
     help = "Создаёт базовые роли (Работник, Менеджер, Администратор) и тестовых пользователей"
 
     def handle(self, *args, **options):
-        # --- 1. Создание ролей ---
         roles_data = [
             {
                 "name": "Работник",
@@ -41,7 +39,6 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f"Роль уже существует: {role.name}")
 
-        # --- 2. Создание тестовых пользователей ---
         users_data = [
             {
                 "username": "admin",
@@ -84,10 +81,8 @@ class Command(BaseCommand):
                 continue
 
             try:
-                # Проверяем пароль на валидность
                 validate_password(user_data["password"])
 
-                # Создаём пользователя
                 user = CustomUser.objects.create_user(
                     username=username,
                     password=user_data["password"],

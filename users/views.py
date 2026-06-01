@@ -2,7 +2,6 @@
 from django.shortcuts import render, redirect
 from .forms import LoginForm
 
-
 def login_view(request):
     if request.user.is_authenticated:
         return redirect("/")
@@ -12,7 +11,6 @@ def login_view(request):
             if form.is_valid():
                 user = form.get_user()
                 login(request, user)
-                # Сохраняем роль пользователя в сессии
                 if user.role:
                     request.session["user_role"] = user.role.codename
                 else:

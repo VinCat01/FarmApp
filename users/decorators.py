@@ -4,9 +4,6 @@ from django.contrib import messages
 
 
 def role_required(*allowed_roles):
-    """Декоратор для проверки роли пользователя.
-    Использование: @role_required("admin", "manager")
-    """
     def decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
             if not request.user.is_authenticated:
@@ -22,20 +19,16 @@ def role_required(*allowed_roles):
 
 
 def worker_required(view_func):
-    """Только для работников"""
     return role_required("worker")(view_func)
 
 
 def manager_required(view_func):
-    """Только для менеджеров"""
     return role_required("manager")(view_func)
 
 
 def admin_role_required(view_func):
-    """Только для администраторов"""
     return role_required("admin")(view_func)
 
 
 def manager_or_admin_required(view_func):
-    """Для менеджеров и администраторов"""
     return role_required("manager", "admin")(view_func)
