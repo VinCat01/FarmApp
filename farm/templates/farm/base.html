@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 <html lang="ru" class="h-100">
 <head>
     <meta charset="UTF-8">
@@ -26,7 +26,64 @@
         .stat-card .icon { font-size: 32px; }
         .page-title { font-weight: 600; color: #333; margin-bottom: 24px; }
         footer { background: #fff; border-top: 1px solid #dee2e6; padding: 16px 0; margin-top: 40px; }
-    </style>
+    
+    /* Адаптивность для мобильных */
+    @media (max-width: 768px) {
+        .wrapper > .container-fluid {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+        h2.page-title {
+            font-size: 1.3rem;
+        }
+        .card-body {
+            padding: 0.75rem !important;
+        }
+        .btn-group-sm .btn {
+            padding: 0.15rem 0.35rem;
+            font-size: 0.75rem;
+        }
+        .table td, .table th {
+            padding: 0.4rem 0.3rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        .navbar-brand {
+            font-size: 1rem;
+        }
+    }
+    @media (max-width: 576px) {
+        .wrapper > .container-fluid {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+        h2.page-title {
+            font-size: 1.1rem;
+        }
+        .card-body {
+            padding: 0.5rem !important;
+        }
+        .table td, .table th {
+            padding: 0.3rem 0.2rem;
+            font-size: 0.75rem;
+        }
+        .d-flex.gap-2 {
+            flex-direction: column;
+            gap: 0.5rem !important;
+        }
+        .d-flex.gap-2 .btn {
+            width: 100%;
+        }
+        .row-cards .col-md-6, .row-cards .col-lg-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .navbar .container-fluid {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+    }
+</style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>

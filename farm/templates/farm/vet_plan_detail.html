@@ -29,7 +29,7 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <table class="table table-borderless small">
+                            <div class="table-responsive"><table class="table table-borderless small">
                                 <tr>
                                     <td class="text-muted">Тип процедуры:</td>
                                     <td><strong>{{ plan.get_procedure_type_display }}</strong></td>
@@ -47,10 +47,10 @@
                                     <td class="text-muted">Группа животных:</td>
                                     <td><strong>{{ plan.species.name|default:"Все виды" }}</strong></td>
                                 </tr>
-                            </table>
+                            </table></div>
                         </div>
                         <div class="col-md-6">
-                            <table class="table table-borderless small">
+                            <div class="table-responsive"><table class="table table-borderless small">
                                 <tr>
                                     <td class="text-muted">Ответственный:</td>
                                     <td>
@@ -65,7 +65,7 @@
                                     <td class="text-muted">Создан:</td>
                                     <td>{{ plan.created_by.full_name|default:plan.created_by.username|default:"—" }}</td>
                                 </tr>
-                            </table>
+                            </table></div>
                         </div>
                     </div>
 
