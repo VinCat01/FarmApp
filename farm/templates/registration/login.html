@@ -1,4 +1,4 @@
-﻿{% extends "farm/base.html" %}
+{% extends "farm/base.html" %}
 
 {% block title %}Вход в систему{% endblock %}
 
@@ -11,7 +11,7 @@
                     <div class="text-center mb-4">
                         <i class="bi bi-shield-lock fs-1 text-success"></i>
                         <h3 class="mt-2">Вход в систему</h3>
-                        <p class="text-muted">FarmApp — Цифровая ферма</p>
+                        <p class="text-muted">FarmApp - Цифровая ферма</p>
                     </div>
 
                     {% if form.non_field_errors %}
@@ -35,7 +35,7 @@
                                    class="form-control {% if form.username.errors %}is-invalid{% endif %}"
                                    id="id_username"
                                    placeholder="Введите логин"
-                                   value="{{ form.username.value|default:'' }}"
+                                   value="{{ form.username.value|default:"" }}"
                                    required autofocus>
                             {% if form.username.errors %}
                             <div class="invalid-feedback">
@@ -65,16 +65,6 @@
                         </button>
                     </form>
                 </div>
-            </div>
-
-            <div class="text-center mt-3">
-                <small class="text-muted">
-                    {% if is_admin_role or is_manager or is_worker %}
-                        <span class="role-badge badge-admin">Администратор</span>
-                        <span class="role-badge badge-manager">Менеджер</span>
-                        <span class="role-badge badge-worker">Работник</span>
-                    {% endif %}
-                </small>
             </div>
         </div>
     </div>

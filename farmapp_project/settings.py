@@ -1,18 +1,12 @@
-﻿
-
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
 
 SECRET_KEY = 'django-insecure-svpb_ll=usm#^aq8d@qyl_#5uzylyt&9gpv%(ped^9p7_n-39k'
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -55,8 +49,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'farmapp_project.wsgi.application'
 
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -64,12 +56,9 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
-        'PORT': 5432,
-    'DISABLE_SERVER_SIDE_CURSORS': True,
+        'PORT': '7777',
     }
 }
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -86,8 +75,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
 LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
@@ -96,8 +83,9 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'users.CustomUser'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'

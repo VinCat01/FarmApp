@@ -1,0 +1,157 @@
+﻿{% extends "farm/base.html" %}
+{% load farm_filters %}
+
+{% block title %}{{ plan.title }} — FarmApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'farm:index' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'farm:vet_plan_list' %}">Планы осмотров</a></li>
+                    <li class="breadcrumb-item active">{{ plan.title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header 
+                    {% if plan.status == 'planned' %}bg-primary
+                    {% elif plan.status == 'completed' %}bg-success
+                    {% elif plan.status == 'cancelled' %}bg-secondary
+                    {% else %}bg-warning text-dark{% endif %} text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="bi bi-heart-pulse me-2"></i>{{ plan.title }}</h4>
+                        <span class="badge bg-light text-dark fs-6">{{ plan.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <table class="table table-borderless small">
+                                <tr>
+                                    <td class="text-muted">Тип процедуры:</td>
+                                    <td><strong>{{ plan.get_procedure_type_display }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Плановая дата:</td>
+                                    <td>
+                                        <strong>{{ plan.planned_date|date:"d.m.Y" }}</strong>
+                                        {% if plan.planned_date < today and plan.status != 'completed' and plan.status != 'cancelled' %}
+                                            <span class="badge bg-danger ms-2">Просрочено!</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Группа животных:</td>
+                                    <td><strong>{{ plan.species.name|default:"Все виды" }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless small">
+                                <tr>
+                                    <td class="text-muted">Ответственный:</td>
+                                    <td>
+                                        <strong>{{ plan.assigned_to.full_name|default:plan.assigned_to.username|default:"Не назначен" }}</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Ориент. стоимость:</td>
+                                    <td><strong>{{ plan.estimated_cost|default:"0"|rub }} ₽</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Создан:</td>
+                                    <td>{{ plan.created_by.full_name|default:plan.created_by.username|default:"—" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% if plan.description %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Описание / Инструкции</h6>
+                        <p class="text-muted">{{ plan.description|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if plan.status != 'completed' and plan.status != 'cancelled' %}
+                    <hr>
+
+                    <!-- Кнопка завершения -->
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-success btn-lg" data-bs-toggle="collapse" data-bs-target="#completeForm">
+                            <i class="bi bi-check2-circle me-1"></i> Завершить и записать в журнал
+                        </button>
+                        <p class="text-muted small mt-1">
+                            <i class="bi bi-info-circle"></i> 
+                            {% if plan.species %}
+                                Мероприятие будет отмечено как выполненное для группы <strong>{{ plan.species.name }}</strong>
+                            {% else %}
+                                Мероприятие будет отмечено как выполненное для всех видов
+                            {% endif %}
+                            . Запись появится в журнале работ.
+                        </p>
+                    </div>
+
+                    <div class="collapse mt-3" id="completeForm">
+                        <div class="card card-body bg-light">
+                            <h6 class="fw-bold">Подтверждение выполнения</h6>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="complete_and_log">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Описание результатов</label>
+                                    <textarea name="description" class="form-control" rows="3" placeholder="Опишите результаты проведённого мероприятия...">{{ plan.description }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Фактическая стоимость (₽)</label>
+                                    <input type="number" name="cost" class="form-control" step="0.01" value="{{ plan.estimated_cost }}">
+                                </div>
+
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check2-circle me-1"></i> Подтвердить выполнение
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Смена статуса -->
+                    <div class="mt-3">
+                        <h6 class="fw-bold">Изменить статус</h6>
+                        <form method="post" class="row g-2 align-items-center">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_status">
+                            <div class="col-auto">
+                                <select name="status" class="form-select">
+                                    <option value="planned" {% if plan.status == "planned" %}selected{% endif %}>Запланировано</option>
+                                    <option value="in_progress" {% if plan.status == "in_progress" %}selected{% endif %}>В процессе</option>
+                                    <option value="completed" {% if plan.status == "completed" %}selected{% endif %}>Выполнено</option>
+                                    <option value="cancelled" {% if plan.status == "cancelled" %}selected{% endif %}>Отменено</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-check-lg"></i> Обновить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{% url 'farm:vet_plan_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Назад к списку
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

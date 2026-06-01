@@ -1,0 +1,129 @@
+{% extends "farm/base.html" %}
+
+{% block title %}{{ title }} — FarmApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'farm:index' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'farm:purchase_list' %}">Закупки</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-cart-plus me-2"></i>{{ title }}</h4>
+                </div>
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Выбор существующего ресурса -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.item.label }}</label>
+                            <div class="input-group">
+                                {{ form.item }}
+                                <button type="button" class="btn btn-outline-success" id="showNewItemBtn" onclick="toggleNewItem()">
+                                    <i class="bi bi-plus-circle"></i> Новый
+                                </button>
+                            </div>
+                            <div class="form-text">Выберите существующий ресурс или нажмите «Новый», чтобы создать</div>
+                        </div>
+
+                        <!-- Создание нового ресурса (скрыто по умолчанию) -->
+                        <div id="newItemBlock" class="card card-body bg-light mb-3" style="display: none;">
+                            <h6 class="fw-bold"><i class="bi bi-plus-circle me-1"></i> Создание нового ресурса</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">{{ form.new_item_name.label }}</label>
+                                    {{ form.new_item_name }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">{{ form.new_item_type.label }}</label>
+                                    {{ form.new_item_type }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">{{ form.new_item_unit.label }}</label>
+                                    {{ form.new_item_unit }}
+                                    <div class="form-text small">{{ form.new_item_unit.help_text }}</div>
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-info-circle"></i> 
+                                После закупки новый ресурс появится на складе и будет доступен для выбора в следующий раз.
+                            </p>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">{{ form.supplier.label }}</label>
+                                {{ form.supplier }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">{{ form.quantity.label }}</label>
+                                {{ form.quantity }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">{{ form.price_per_unit.label }}</label>
+                                {{ form.price_per_unit }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.invoice_number.label }}</label>
+                            {{ form.invoice_number }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.notes.label }}</label>
+                            {{ form.notes }}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg me-1"></i> Оформить закупку
+                            </button>
+                            <a href="{% url 'farm:purchase_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i> Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleNewItem() {
+    var block = document.getElementById("newItemBlock");
+    var select = document.getElementById("id_item");
+    var btn = document.getElementById("showNewItemBtn");
+    
+    if (block.style.display === "none") {
+        block.style.display = "block";
+        btn.classList.remove("btn-outline-success");
+        btn.classList.add("btn-success");
+        select.value = "";
+        select.disabled = true;
+    } else {
+        block.style.display = "none";
+        btn.classList.remove("btn-success");
+        btn.classList.add("btn-outline-success");
+        select.disabled = false;
+    }
+}
+</script>
+{% endblock %}

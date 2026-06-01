@@ -1,5 +1,8 @@
-from django.apps import AppConfig
+﻿from django.apps import AppConfig
 
 
 class FarmConfig(AppConfig):
-    name = 'farm'
+    name = "farm"
+
+    def ready(self):
+        import farm.signals  # noqa

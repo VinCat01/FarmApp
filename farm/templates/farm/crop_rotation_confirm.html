@@ -1,0 +1,41 @@
+{% extends "farm/base.html" %}
+
+{% block title %}{{ title }} — FarmApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="bi bi-check2-circle me-2"></i>{{ title }}</h4>
+                </div>
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-tree display-1 text-success"></i>
+                    <h5 class="mt-3">Сбор урожая: {{ rotation.crop.name }}</h5>
+                    <p class="text-muted">
+                        Поле: <strong>{{ rotation.field.cadastral_number }}</strong><br>
+                        Посажено: {{ rotation.planting_date|date:"d.m.Y" }}<br>
+                        Плановая уборка: {{ rotation.harvest_planned|date:"d.m.Y" }}
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <p class="text-muted mb-3">
+                            После сбора урожая поле станет свободным для новых посадок.
+                        </p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg me-1"></i> Подтвердить сбор
+                            </button>
+                            <a href="{% url 'farm:crop_rotation_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i> Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

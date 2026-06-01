@@ -1,0 +1,73 @@
+{% extends "farm/base.html" %}
+
+{% block title %}{{ title }} — FarmApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'farm:index' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'farm:crop_rotation_list' %}">Севооборот</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-tree me-2"></i>{{ title }}</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Выберите свободное поле и культуру для посадки.
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.field.label }}</label>
+                                {{ form.field }}
+                                {% if form.field.errors %}
+                                <div class="text-danger small">{{ form.field.errors }}</div>
+                                {% endif %}
+                                <div class="form-text">Показываются только свободные поля</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.crop.label }}</label>
+                                {{ form.crop }}
+                                {% if form.crop.errors %}
+                                <div class="text-danger small">{{ form.crop.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.planting_date.label }}</label>
+                                {{ form.planting_date }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.harvest_planned.label }}</label>
+                                {{ form.harvest_planned }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg me-1"></i> Назначить посадку
+                            </button>
+                            <a href="{% url 'farm:crop_rotation_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i> Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

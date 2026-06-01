@@ -1,0 +1,254 @@
+﻿{% extends "farm/base.html" %}
+{% load farm_filters %}
+
+{% block title %}{{ title }} - FarmApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title mb-0"><i class="bi bi-graph-up-arrow me-2"></i>{{ title }}</h2>
+            <p class="text-muted small mb-0">Финансовая отчётность за выбранный период</p>
+        </div>
+        <div>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="bi bi-printer me-1"></i> Печать / PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Фильтр периода -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body py-2">
+            <form method="get" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <label class="col-form-label small fw-bold">Период:</label>
+                </div>
+                <div class="col-auto">
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="{{ start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-auto">
+                    <span class="mx-1">-</span>
+                </div>
+                <div class="col-auto">
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="{{ end_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-success">
+                        <i class="bi bi-search me-1"></i> Сформировать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ключевые показатели -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-success border-start border-4 h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Доход (продажи)</h6>
+                    <p class="h3 mb-0 text-success">{{ total_income|rub }} руб.</p>
+                    <small class="text-muted">{{ sales_count }} завершённых продаж</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-danger border-start border-4 h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Расходы</h6>
+                    <p class="h3 mb-0 text-danger">{{ total_expenses|rub }} руб.</p>
+                    <small class="text-muted">
+                        Закупки: {{ total_purchase_cost|rub }} руб. | Вет. услуги: {{ total_vet_cost|rub }} руб.
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm {% if profit >= 0 %}border-success{% else %}border-danger{% endif %} border-start border-4 h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Прибыль</h6>
+                    <p class="h3 mb-0 {% if profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {% if profit >= 0 %}+{% endif %}{{ profit|rub }} руб.
+                    </p>
+                    <small class="text-muted">
+                        {% if profit >= 0 %}Положительный результат{% else %}Убыток{% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm {% if profitability_pct >= 0 %}border-info{% else %}border-danger{% endif %} border-start border-4 h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Рентабельность</h6>
+                    <p class="h3 mb-0 {% if profitability_pct >= 0 %}text-info{% else %}text-danger{% endif %}">
+                        {% if profitability_pct >= 0 %}+{% endif %}{{ profitability_pct }}%
+                    </p>
+                    <small class="text-muted">Отношение прибыли к расходам</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Детализация доходов -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-cart me-2"></i>Доходы - Завершённые продажи</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Дата</th>
+                        <th>Продукция</th>
+                        <th>Кол-во</th>
+                        <th>Цена</th>
+                        <th>Сумма</th>
+                        <th>Покупатель</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td class="small">{{ sale.created_at|date:"d.m.Y" }}</td>
+                        <td>{{ sale.item.name }}</td>
+                        <td>{{ sale.quantity }} {{ sale.item.unit }}</td>
+                        <td>{{ sale.price_per_unit|rub }} руб.</td>
+                        <td class="fw-bold">{{ sale.total_amount }} руб.</td>
+                        <td>{{ sale.buyer }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-3">
+                            Нет завершённых продаж за выбранный период
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-success">
+                    <tr>
+                        <td colspan="4" class="text-end fw-bold">Итого доход:</td>
+                        <td colspan="2" class="fw-bold">{{ total_income|rub }} руб.</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Детализация расходов -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-cart-plus me-2"></i>Расходы - Закупки</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Дата</th>
+                                <th>Товар</th>
+                                <th>Кол-во</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in purchases %}
+                            <tr>
+                                <td class="small">{{ p.created_at|date:"d.m.Y" }}</td>
+                                <td>{{ p.item.name }}</td>
+                                <td>{{ p.quantity }} {{ p.item.unit }}</td>
+                                <td class="fw-bold text-danger">{{ p.total_cost|rub }} руб.</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    Нет закупок за выбранный период
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-danger">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Итого закупок:</td>
+                                <td class="fw-bold">{{ total_purchase_cost|rub }} руб.</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-heart-pulse me-2"></i>Расходы - Вет. услуги</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Дата</th>
+                                <th>Название</th>
+                                <th>Тип</th>
+                                <th>Стоимость</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plan in vet_plans %}
+                            <tr>
+                                <td class="small">{{ plan.updated_at|date:"d.m.Y" }}</td>
+                                <td>{{ plan.title }}</td>
+                                <td>{{ plan.get_procedure_type_display }}</td>
+                                <td class="fw-bold text-danger">{{ plan.estimated_cost|rub }} руб.</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    Нет выполненных вет. планов за период
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-warning">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Итого вет. услуг:</td>
+                                <td class="fw-bold">{{ total_vet_cost|rub }} руб.</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Итоговый блок -->
+    <div class="card shadow-sm {% if profit >= 0 %}border-success{% else %}border-danger{% endif %}">
+        <div class="card-body text-center py-4">
+            <h4 class="mb-0">
+                {% if profit >= 0 %}
+                <i class="bi bi-arrow-up-circle text-success me-2"></i>
+                {% else %}
+                <i class="bi bi-arrow-down-circle text-danger me-2"></i>
+                {% endif %}
+                Прибыль за период:
+                <span class="{% if profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {% if profit >= 0 %}+{% endif %}{{ profit|rub }} руб.
+                </span>
+            </h4>
+            <p class="text-muted small mt-1">
+                {{ start_date|date:"d.m.Y" }} - {{ end_date|date:"d.m.Y" }} | 
+                Рентабельность: {% if profitability_pct >= 0 %}+{% endif %}{{ profitability_pct }}%
+            </p>
+            <div class="mt-2">
+                <a href="{% url 'farm:index' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-speedometer2 me-1"></i> На главную
+                </a>
+                <a href="{% url 'farm:sale_order_create' %}" class="btn btn-sm btn-success">
+                    <i class="bi bi-plus-lg me-1"></i> Новая продажа
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

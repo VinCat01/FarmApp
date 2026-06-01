@@ -1,0 +1,110 @@
+{% extends "farm/base.html" %}
+
+{% block title %}{{ title }} — FarmApp{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title mb-0"><i class="bi bi-journal-text me-2"></i>Журнал работ</h2>
+            <p class="text-muted small mb-0">Всего записей: {{ logs|length }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if is_worker %}
+            <a href="{% url 'farm:work_log_create' %}" class="btn btn-success">
+                <i class="bi bi-plus-lg me-1"></i> Новая запись
+            </a>
+            {% endif %}
+            <a href="{% url 'farm:harvest_create' %}" class="btn btn-outline-success">
+                <i class="bi bi-database-add me-1"></i> Ввод сбора
+            </a>
+        </div>
+    </div>
+
+    <!-- Фильтр по дате -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body py-2">
+            <form method="get" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <label class="col-form-label small">Показать за:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="days" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Всё время</option>
+                        <option value="1" {% if request.GET.days == "1" %}selected{% endif %}>Последний день</option>
+                        <option value="7" {% if request.GET.days == "7" %}selected{% endif %}>Последние 7 дней</option>
+                        <option value="30" {% if request.GET.days == "30" %}selected{% endif %}>Последние 30 дней</option>
+                        <option value="90" {% if request.GET.days == "90" %}selected{% endif %}>Последние 90 дней</option>
+                    </select>
+                </div>
+                {% if request.GET.days %}
+                <div class="col-auto">
+                    <a href="{% url 'farm:work_log_list' %}" class="btn btn-sm btn-outline-secondary">Сброс</a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Список записей -->
+    <div class="card shadow-sm">
+        {% if logs %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Дата и время</th>
+                        <th>Сотрудник</th>
+                        <th>Действие</th>
+                        <th>Объект</th>
+                        <th>Объём</th>
+                        <th>Комментарий</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="small text-nowrap">{{ log.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <strong>{{ log.user.full_name|default:log.user.username }}</strong>
+                            <span class="badge bg-light text-dark small">{{ log.user.role.name|default:"—" }}</span>
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if log.action_type == 'feeding' %}bg-success
+                                {% elif log.action_type == 'milking' %}bg-info
+                                {% elif log.action_type == 'harvesting' %}bg-warning text-dark
+                                {% elif log.action_type == 'cleaning' %}bg-secondary
+                                {% elif log.action_type == 'treatment' %}bg-danger
+                                {% else %}bg-primary{% endif %}">
+                                {{ log.get_action_type_display }}
+                            </span>
+                        </td>
+                        <td class="small">{{ log.target_repr|default:"—" }}</td>
+                        <td>
+                            {% if log.quantity %}
+                                <strong>{{ log.quantity }}</strong> 
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">{{ log.description|truncatechars:50|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card-body text-center py-5">
+            <i class="bi bi-journal-text display-4 text-muted"></i>
+            <p class="mt-3 text-muted">Записей в журнале работ пока нет.</p>
+            {% if is_worker %}
+            <a href="{% url 'farm:work_log_create' %}" class="btn btn-success">
+                <i class="bi bi-plus-lg me-1"></i> Создать первую запись
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

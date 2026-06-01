@@ -1,6 +1,5 @@
 ﻿from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth.views import LogoutView
 from users import views
 
 admin.site.site_header = "Панель управления FarmApp"
@@ -10,6 +9,6 @@ admin.site.index_title = "Добро пожаловать в систему уп
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("farm.urls")),
-    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+    path("logout/", views.logout_view, name="logout"),
     path("login/", views.login_view, name="login"),
 ]

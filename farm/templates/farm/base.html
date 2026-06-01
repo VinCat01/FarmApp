@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <html lang="ru" class="h-100">
 <head>
     <meta charset="UTF-8">
@@ -14,11 +14,6 @@
         .nav-link { color: #333; border-radius: 8px; margin: 2px 8px; padding: 10px 12px; transition: all 0.2s; }
         .nav-link:hover { background: #e9f5ef; color: #198754; }
         .nav-link.active { background: #198754; color: #fff; }
-
-        .nav-link-h { color: #fff; border-radius: 8px; margin: 2px 8px; padding: 10px 12px; transition: all 0.2s; }
-        .nav-link-h:hover { background: #e9f5ef; color: #198754; }
-        .nav-link-h.active { background: #198754; color: #fff; }
-
         .nav-link i { margin-right: 8px; }
         .sidebar-heading { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: #6c757d; padding: 12px 16px 4px; margin-top: 8px; }
         .role-badge { font-size: 11px; padding: 2px 10px; border-radius: 12px; font-weight: 500; }
@@ -43,135 +38,168 @@
         <div class="row">
             {% if request.user.is_authenticated %}
             <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <!-- НАВИГАЦИЯ - для всех -->
-                    <div class="sidebar-heading">Навигация</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
-                                <i class="bi bi-speedometer2"></i> Дашборд
-                            </a>
-                        </li>
-                    </ul>
+    <div class="position-sticky pt-3">
+        <!-- Навигация -->
+        <div class="sidebar-heading">Навигация</div>
+        <ul class="nav flex-column mb-3">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'farm:index' %}">
+                    <i class="bi bi-speedometer2"></i> Дашборд
+                </a>
+            </li>
+        </ul>
 
-                    <!-- РАБОТНИК: оперативная работа -->
-                    {% if is_worker %}
-                    <div class="sidebar-heading">Оперативная работа</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-clipboard-plus"></i> Регистрация события
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-database-add"></i> Ввод данных об удое/сборе
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-arrow-left-right"></i> Перемещение животных
-                            </a>
-                        </li>
-                    </ul>
-                    {% endif %}
-
-                    <!-- МЕНЕДЖЕР: планирование и аналитика -->
-                    {% if is_manager or is_admin_role %}
-                    <div class="sidebar-heading">Планирование</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-heart-pulse"></i> Ветеринарный осмотр
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-tree"></i> Севооборот
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-cart-plus"></i> Закупка ресурсов
-                            </a>
-                        </li>
-                    </ul>
-
-                    <div class="sidebar-heading">Аналитика</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-file-earmark-bar-graph"></i> Отчёты
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-currency-dollar"></i> Прибыль / Рентабельность
-                            </a>
-                        </li>
-                    </ul>
-                    {% endif %}
-
-                    <!-- АДМИНИСТРАТОР: управление -->
-                    {% if is_admin_role %}
-                    <div class="sidebar-heading">Управление</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:index' %}">
-                                <i class="bi bi-gear"></i> Панель администратора
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:users_customuser_changelist' %}">
-                                <i class="bi bi-people"></i> Управление персоналом
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:index' %}">
-                                <i class="bi bi-book"></i> Справочники
-                            </a>
-                        </li>
-                    </ul>
-                    {% endif %}
-
-                    <!-- СПРАВОЧНЫЕ РАЗДЕЛЫ - только для администраторов -->
-                    {% if is_admin_role %}
-                    <div class="sidebar-heading">База данных</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:farm_animal_changelist' %}">
-                                <i class="bi bi bi-egg"></i> Животные
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:farm_species_changelist' %}">
-                                <i class="bi bi-tags"></i> Виды животных
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:farm_field_changelist' %}">
-                                <i class="bi bi-map"></i> Поля
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:farm_storage_changelist' %}">
-                                <i class="bi bi-box-seam"></i> Склад / Ресурсы
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:farm_croprotation_changelist' %}">
-                                <i class="bi bi-arrow-repeat"></i> Севооборот
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:farm_veterinarylog_changelist' %}">
-                                <i class="bi bi-clipboard2-pulse"></i> Ветеринарный журнал
-                            </a>
-                        </li>
-                    </ul>
-                    {% endif %}
+        <!-- Рабочие операции (Аккордеон) -->
+        {% if is_worker or is_manager or is_admin_role %}
+        <div class="accordion" id="sidebarAccordion">
+            <div class="accordion-item border-0">
+                <h2 class="accordion-header" id="headingWork">
+                    <button class="accordion-button collapsed sidebar-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWork">
+                        <i class="bi bi-tools me-2"></i> Рабочие операции
+                    </button>
+                </h2>
+                <div id="collapseWork" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+                    <div class="accordion-body p-0">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'work_log_create' %}active{% endif %}" href="{% url 'farm:work_log_create' %}">
+                                    <i class="bi bi-clipboard-plus"></i> Новая запись в журнал
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'work_log_list' %}active{% endif %}" href="{% url 'farm:work_log_list' %}">
+                                    <i class="bi bi-journal-text"></i> Журнал работ
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'harvest_create' %}active{% endif %}" href="{% url 'farm:harvest_create' %}">
+                                    <i class="bi bi-database-add"></i> Учёт продукции (сбор)
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </nav>
+            </div>
+
+            <!-- Управление (Аккордеон) -->
+            {% if is_manager or is_admin_role %}
+            <div class="accordion-item border-0">
+                <h2 class="accordion-header" id="headingMgmt">
+                    <button class="accordion-button collapsed sidebar-heading" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMgmt">
+                        <i class="bi bi-gear me-2"></i> Управление
+                    </button>
+                </h2>
+                <div id="collapseMgmt" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+                    <div class="accordion-body p-0">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'vet_plan_list' %}active{% endif %}" href="{% url 'farm:vet_plan_list' %}">
+                                    <i class="bi bi-heart-pulse"></i> Вет. планы
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'vet_plan_create' %}active{% endif %}" href="{% url 'farm:vet_plan_create' %}">
+                                    <i class="bi bi-plus-circle"></i> Создать вет. план
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'crop_rotation_list' %}active{% endif %}" href="{% url 'farm:crop_rotation_list' %}">
+                                    <i class="bi bi-tree"></i> Севооборот
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'purchase_list' %}active{% endif %}" href="{% url 'farm:purchase_list' %}">
+                                    <i class="bi bi-cart-plus"></i> Закупки
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'sale_order_list' %}active{% endif %}" href="{% url 'farm:sale_order_list' %}">
+                                    <i class="bi bi-cart"></i> Продажи
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Отчёты -->
+        {% if is_manager or is_admin_role %}
+        <div class="sidebar-heading mt-3">Отчёты</div>
+        <ul class="nav flex-column mb-3">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'profit_report' %}active{% endif %}" href="{% url 'farm:profit_report' %}">
+                    <i class="bi bi-file-earmark-bar-graph"></i> Отчёты / Прибыль
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        <!-- Администрирование -->
+        {% if is_admin_role %}
+        <div class="sidebar-heading">Администрирование</div>
+        <ul class="nav flex-column mb-3">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">
+                    <i class="bi bi-gear"></i> Панель администратора
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:users_customuser_changelist' %}">
+                    <i class="bi bi-people"></i> Пользователи
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">
+                    <i class="bi bi-book"></i> Журнал действий
+                </a>
+            </li>
+        </ul>
+
+        <!-- Управление данными -->
+        <div class="sidebar-heading">Управление данными</div>
+        <ul class="nav flex-column mb-3">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:farm_animal_changelist' %}">
+                    <i class="bi bi-egg"></i> Животные
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:farm_species_changelist' %}">
+                    <i class="bi bi-tags"></i> Виды
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:farm_field_changelist' %}">
+                    <i class="bi bi-map"></i> Поля
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:farm_storage_changelist' %}">
+                    <i class="bi bi-box-seam"></i> Склад
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:farm_croprotation_changelist' %}">
+                    <i class="bi bi-arrow-repeat"></i> Севооборот
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:farm_veterinarylog_changelist' %}">
+                    <i class="bi bi-clipboard2-pulse"></i> Вет. журнал
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:farm_actionlog_changelist' %}">
+                    <i class="bi bi-activity"></i> Лог действий
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+    </div>
+</nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
 {% else %}
             <main class="col-md-12 px-md-4 py-4">
@@ -199,3 +227,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+

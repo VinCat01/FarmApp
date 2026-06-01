@@ -1,28 +1,28 @@
-﻿from django.core.management.base import BaseCommand
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+from django.core.management.base import BaseCommand
+from django.contrib.auth.hashers import make_password
 from users.models import Role, CustomUser
 
 
 class Command(BaseCommand):
-    help = "Создаёт базовые роли (Работник, Менеджер, Администратор) и тестовых пользователей"
+    help = "Создание ролей (Работник, Менеджер, Администратор) и тестовых пользователей"
 
     def handle(self, *args, **options):
+        # === РОЛИ ===
         roles_data = [
             {
                 "name": "Работник",
                 "codename": "worker",
-                "description": "Линейный персонал. Вносит оперативные данные: факты кормления, замеры веса, объемы сбора продукции и перемещение животных.",
+                "description": "Исполнительный персонал. Выполняет ежедневные задачи: кормление, уборка, сбор продукции и уход за животными.",
             },
             {
                 "name": "Менеджер",
                 "codename": "manager",
-                "description": "Профильный специалист (зоотехник, агроном или управляющий). Формирует планы, работает с поставщиками и покупателями, анализирует отчетность.",
+                "description": "Управляющий состав (агрономы, зоотехники). Планирует работы, контролирует процессы и анализирует показатели, управляет закупками.",
             },
             {
                 "name": "Администратор",
                 "codename": "admin",
-                "description": "Технический специалист. Отвечает за работоспособность системы, учетные записи сотрудников, изменения в справочниках и целостность БД.",
+                "description": "Полный доступ к управлению системой. Отвечает за настройку системы, управление пользователями, права доступа и администрирование БД.",
             },
         ]
 
@@ -39,6 +39,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f"Роль уже существует: {role.name}")
 
+        # === ПОЛЬЗОВАТЕЛИ ===
         users_data = [
             {
                 "username": "admin",
@@ -65,7 +66,7 @@ class Command(BaseCommand):
                 "password": "ManagerAS",
                 "full_name": "Анна Смирнова",
                 "phone": "+7-999-444-55-66",
-                "position": "Зоотехник",
+                "position": "Агроном",
                 "role_codename": "manager",
                 "is_superuser": False,
                 "is_staff": True,
@@ -81,8 +82,6 @@ class Command(BaseCommand):
                 continue
 
             try:
-                validate_password(user_data["password"])
-
                 user = CustomUser.objects.create_user(
                     username=username,
                     password=user_data["password"],
@@ -102,13 +101,6 @@ class Command(BaseCommand):
                     )
                 )
 
-            except ValidationError as e:
-                self.stdout.write(
-                    self.style.ERROR(
-                        f"Пароль для {username} не прошёл валидацию: "
-                        f"{'; '.join(e.messages)}"
-                    )
-                )
             except Exception as e:
                 self.stdout.write(
                     self.style.ERROR(
@@ -118,7 +110,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Готово! Все роли и пользователи созданы."))
         self.stdout.write("")
-        self.stdout.write("Тестовые учётные данные:")
+        self.stdout.write("Учётные данные для входа:")
         self.stdout.write("  Администратор: admin / VindovCat")
         self.stdout.write("  Работник:       Vindov.cat / VinCat123")
         self.stdout.write("  Менеджер:       anna_manager / ManagerAS")

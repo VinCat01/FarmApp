@@ -1,88 +1,377 @@
-{% extends "farm/base.html" %}
+﻿{% extends "farm/base.html" %}
+{% load farm_filters %}
 
 {% block content %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Оперативная сводка</h1>
+    <h1 class="h2">Главная панель</h1>
 </div>
+
 {% if request.user.is_authenticated %}
+<!-- Верхние карточки статистики -->
 <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
     <div class="col">
         <div class="card h-100 shadow-sm border-primary border-start border-4">
             <div class="card-body">
                 <h6 class="card-title text-muted text-uppercase small">Поголовье</h6>
-                <p class="h3 mb-0">{{ animals_count }} особей</p>
-                <small class="text-success"><i class="bi bi-arrow-up"></i> +2 в этом месяце</small>
+                <p class="h3 mb-0">{{ animals_count }} гол.</p>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> Все виды животных</small>
             </div>
         </div>
     </div>
     <div class="col">
         <div class="card h-100 shadow-sm border-success border-start border-4">
             <div class="card-body">
-                <h6 class="card-title text-muted text-uppercase small">Землепользование</h6>
+                <h6 class="card-title text-muted text-uppercase small">Общая площадь</h6>
                 <p class="h3 mb-0">{{ total_area }} га</p>
-                <small class="text-muted">Занято под посев: 86%</small>
+                <small class="text-muted">Суммарная площадь полей</small>
             </div>
         </div>
     </div>
     <div class="col">
         <div class="card h-100 shadow-sm border-warning border-start border-4">
             <div class="card-body">
-                <h6 class="card-title text-muted text-uppercase small">Критический склад</h6>
-                <p class="h3 mb-0 text-danger">{{ low_stock_count }} поз.</p>
-                <small class="text-muted">Требуется закупка кормов</small>
+                <h6 class="card-title text-muted text-uppercase small">Низкий запас</h6>
+                <p class="h3 mb-0 text-danger">{{ low_stock_count }} ед.</p>
+                <small class="text-muted">Требуется пополнение склада</small>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Финансовые карточки (только для менеджеров и админов) -->
+{% if is_manager or is_admin_role %}
+<div class="row row-cols-1 row-cols-md-4 g-4 mb-4">
+    <div class="col">
+        <a href="{% url 'farm:sale_order_list' %}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-info border-start border-4">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Продажи</h6>
+                    <p class="h3 mb-0 text-info">{{ total_sales }}</p>
+                    <small class="text-muted">Всего завершённых продаж</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{% url 'farm:purchase_list' %}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-secondary border-start border-4">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Закупки</h6>
+                    <p class="h3 mb-0 text-secondary">{{ total_purchases }}</p>
+                    <small class="text-muted">Всего закупок</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{% url 'farm:profit_report' %}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-success border-start border-4">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Доход (месяц)</h6>
+                    <p class="h3 mb-0 text-success">{{ month_income|rub }} руб.</p>
+                    <small class="text-muted">За текущий месяц</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{% url 'farm:profit_report' %}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm {% if month_profit >= 0 %}border-success{% else %}border-danger{% endif %} border-start border-4">
+                <div class="card-body">
+                    <h6 class="card-title text-muted text-uppercase small">Прибыль (месяц)</h6>
+                    <p class="h3 mb-0 {% if month_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {% if month_profit >= 0 %}+{% endif %}{{ month_profit|rub }} руб.
+                    </p>
+                    <small class="text-muted">Доход - Расходы</small>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endif %}
 
-<div class="card shadow-sm">
+<!-- Быстрые ссылки -->
+<div class="row g-3 mb-4">
+    <!-- Рабочие операции (Dropdown) -->
+    <div class="col-md-4">
+        <div class="dropdown">
+            <button class="btn btn-outline-success w-100 py-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-tools fs-4 d-block mb-1"></i>
+                <span>Рабочие операции</span>
+            </button>
+            <ul class="dropdown-menu w-100">
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:work_log_create' %}">
+                        <i class="bi bi-clipboard-plus me-2"></i>Новая запись в журнал
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:work_log_list' %}">
+                        <i class="bi bi-journal-text me-2"></i>Журнал работ
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:harvest_create' %}">
+                        <i class="bi bi-database-add me-2"></i>Учёт продукции (сбор)
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Управление (Dropdown) - только для менеджеров и админов -->
+    {% if is_manager or is_admin_role %}
+    <div class="col-md-4">
+        <div class="dropdown">
+            <button class="btn btn-outline-primary w-100 py-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-gear fs-4 d-block mb-1"></i>
+                <span>Управление</span>
+            </button>
+            <ul class="dropdown-menu w-100">
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:vet_plan_create' %}">
+                        <i class="bi bi-plus-circle me-2"></i>Создать вет. план
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:vet_plan_list' %}">
+                        <i class="bi bi-heart-pulse me-2"></i>Все вет. планы
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:crop_rotation_list' %}">
+                        <i class="bi bi-tree me-2"></i>Севооборот
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:purchase_list' %}">
+                        <i class="bi bi-cart-plus me-2"></i>Закупки
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:sale_order_list' %}">
+                        <i class="bi bi-cart me-2"></i>Продажи
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'farm:profit_report' %}">
+                        <i class="bi bi-graph-up-arrow me-2"></i>Отчёт о прибыли
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Отчёты -->
+    {% if is_manager or is_admin_role %}
+    <div class="col-md-4">
+        <a href="{% url 'farm:profit_report' %}" class="btn btn-outline-warning w-100 py-3">
+            <i class="bi bi-graph-up-arrow fs-4 d-block mb-1"></i>
+            <span>Отчёт о прибыли</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Ближайшие<!-- Ближайшие вет. планы -->
+<div class="card shadow-sm mb-4">
     <div class="card-header bg-transparent fw-bold">
-        <i class="bi bi-clock-history me-2"></i>Последние ветеринарные мероприятия
+        <i class="bi bi-heart-pulse me-2 text-success"></i>Ближайшие ветеринарные планы
     </div>
     <div class="table-responsive p-3">
         <table class="table table-sm table-hover align-middle">
             <thead class="table-light">
                 <tr>
                     <th>Дата</th>
-                    <th>Животное</th>
-                    <th>Мероприятие/Диагноз</th>
-                    <th>Затраты</th>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>Вид</th>
+                    <th>Ответственный</th>
+                    <th>Статус</th>
                 </tr>
             </thead>
             <tbody>
-                {% for op in latest_operations %}
-                <tr>
-                    <td>{{ op.data|date:"d.m.Y" }}</td>
-                    <td>
-                        <span class="badge bg-secondary">#{{ op.animal.inventory_number }}</span>
-                        {{ op.animal.species.name }}
+                {% for plan in upcoming_vet_plans %}
+                <tr class="{% if plan.planned_date < today and plan.status == 'planned' %}table-warning{% endif %}">
+                    <td class="text-nowrap">
+                        {% if plan.planned_date < today and plan.status == 'planned' %}
+                            <i class="bi bi-exclamation-triangle text-danger me-1"></i>
+                        {% endif %}
+                        {{ plan.planned_date|date:"d.m.Y" }}
                     </td>
-                    <td>{{ op.description|truncatechars:50 }}</td>
-                    <td>{{ op.cost }} ₽</td>
+                    <td>
+                        <a href="{% url 'farm:vet_plan_detail' plan.pk %}" class="text-decoration-none fw-bold">
+                            {{ plan.title }}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="badge 
+                            {% if plan.procedure_type == 'vaccination' %}bg-info
+                            {% elif plan.procedure_type == 'examination' %}bg-success
+                            {% elif plan.procedure_type == 'treatment' %}bg-danger
+                            {% elif plan.procedure_type == 'testing' %}bg-warning text-dark
+                            {% else %}bg-secondary{% endif %}">
+                            {{ plan.get_procedure_type_display }}
+                        </span>
+                    </td>
+                    <td>{{ plan.species.name|default:"Все виды" }}</td>
+                    <td>{{ plan.assigned_to.full_name|default:plan.assigned_to.username|default:"-" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if plan.status == 'planned' %}bg-primary
+                            {% elif plan.status == 'in_progress' %}bg-warning text-dark
+                            {% elif plan.status == 'completed' %}bg-success
+                            {% elif plan.status == 'cancelled' %}bg-secondary{% endif %}">
+                            {{ plan.get_status_display }}
+                        </span>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center text-muted py-3">Записей пока нет</td>
+                    <td colspan="6" class="text-center text-muted py-3">
+                        <i class="bi bi-calendar-check me-1"></i> Нет запланированных ветеринарных планов
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_manager or is_admin_role %}
+    <div class="card-footer bg-transparent text-end">
+        <a href="{% url 'farm:vet_plan_create' %}" class="btn btn-sm btn-success">
+            <i class="bi bi-plus-lg"></i> Создать новый план
+        </a>
+        <a href="{% url 'farm:vet_plan_list' %}" class="btn btn-sm btn-outline-primary">
+            Все планы
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Последние продажи -->
+{% if is_manager or is_admin_role %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent fw-bold">
+        <i class="bi bi-cart me-2 text-success"></i>Последние продажи
+    </div>
+    <div class="table-responsive p-3">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Дата</th>
+                    <th>Продукция</th>
+                    <th>Кол-во</th>
+                    <th>Сумма</th>
+                    <th>Покупатель</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in latest_sales %}
+                <tr>
+                    <td class="small text-nowrap">{{ sale.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>{{ sale.item.name }}</td>
+                    <td>{{ sale.quantity }} {{ sale.item.unit }}</td>
+                    <td class="fw-bold">{{ sale.total_amount|rub }} руб.</td>
+                    <td>{{ sale.buyer }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if sale.status == 'pending' %}bg-warning text-dark
+                            {% elif sale.status == 'approved' %}bg-primary
+                            {% elif sale.status == 'completed' %}bg-success
+                            {% elif sale.status == 'cancelled' %}bg-secondary{% endif %}">
+                            {{ sale.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3">
+                        <i class="bi bi-cart me-1"></i> Продаж пока нет
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     <div class="card-footer bg-transparent text-end">
-        <a href="#" class="btn btn-sm btn-outline-primary">Весь журнал</a>
+        <a href="{% url 'farm:sale_order_create' %}" class="btn btn-sm btn-success">
+            <i class="bi bi-plus-lg"></i> Новая продажа
+        </a>
+        <a href="{% url 'farm:sale_order_list' %}" class="btn btn-sm btn-outline-primary">
+            Все продажи
+        </a>
     </div>
 </div>
+{% endif %}
+
+<!-- Последние записи в журнале работ -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent fw-bold">
+        <i class="bi bi-journal-text me-2"></i>Последние записи в журнале работ
+    </div>
+    <div class="table-responsive p-3">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Дата</th>
+                    <th>Пользователь</th>
+                    <th>Действие</th>
+                    <th>Объект</th>
+                    <th>Кол-во</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in latest_work_logs %}
+                <tr>
+                    <td class="small text-nowrap">{{ log.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>{{ log.user.full_name|default:log.user.username }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if log.action_type == 'feeding' %}bg-success
+                            {% elif log.action_type == 'milking' %}bg-info
+                            {% elif log.action_type == 'harvesting' %}bg-warning text-dark
+                            {% elif log.action_type == 'cleaning' %}bg-secondary
+                            {% elif log.action_type == 'treatment' %}bg-danger
+                            {% else %}bg-primary{% endif %}">
+                            {{ log.get_action_type_display }}
+                        </span>
+                    </td>
+                    <td class="small">{{ log.target_repr|default:"-" }}</td>
+                    <td>{% if log.quantity %}{{ log.quantity }}{% else %}-{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-3">
+                        <i class="bi bi-journal-text me-1"></i> Записей пока нет
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-transparent text-end">
+        <a href="{% url 'farm:work_log_create' %}" class="btn btn-sm btn-success">
+            <i class="bi bi-plus-lg"></i> Новая запись
+        </a>
+        <a href="{% url 'farm:work_log_list' %}" class="btn btn-sm btn-outline-primary">
+            Все записи
+        </a>
+    </div>
+</div>
+
 {% else %}
     <div class="container py-4">
-  <div class="row">
-    <div class="col-12">
-
-      <p class="fs-1 text-justify">
-        Пожалуйста авторизуйтесь
-      </p>
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="fs-4 text-muted">Пожалуйста, войдите в систему для работы с FarmApp</p>
+                <a href="{% url 'login' %}" class="btn btn-success btn-lg">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+                </a>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 {% endif %}
 {% endblock %}
