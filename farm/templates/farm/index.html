@@ -1,4 +1,4 @@
-﻿{% extends "farm/base.html" %}
+{% extends "farm/base.html" %}
 {% load farm_filters %}
 
 {% block content %}
@@ -8,7 +8,7 @@
 
 {% if request.user.is_authenticated %}
 <!-- Верхние карточки статистики -->
-<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+<div class="row row-cols-1 row-cols-sm-2 g-4 mb-4">
     <div class="col">
         <div class="card h-100 shadow-sm border-primary border-start border-4">
             <div class="card-body">
@@ -27,20 +27,10 @@
             </div>
         </div>
     </div>
-    <div class="col">
-        <div class="card h-100 shadow-sm border-warning border-start border-4">
-            <div class="card-body">
-                <h6 class="card-title text-muted text-uppercase small">Низкий запас</h6>
-                <p class="h3 mb-0 text-danger">{{ low_stock_count }} ед.</p>
-                <small class="text-muted">Требуется пополнение склада</small>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Финансовые карточки (только для менеджеров и админов) -->
 {% if is_manager or is_admin_role %}
-<div class="row row-cols-1 row-cols-md-4 g-4 mb-4">
+<div class="row row-cols-2 row-cols-lg-4 g-3 mb-4 align-items-stretch">
     <div class="col">
         <a href="{% url 'farm:sale_order_list' %}" class="text-decoration-none">
             <div class="card h-100 shadow-sm border-info border-start border-4">
@@ -91,7 +81,7 @@
 {% endif %}
 
 <!-- Быстрые ссылки -->
-<div class="row g-3 mb-4">
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
     <!-- Рабочие операции (Dropdown) -->
     <div class="col-md-4">
         <div class="dropdown">

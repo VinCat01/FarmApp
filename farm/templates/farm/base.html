@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <html lang="ru" class="h-100">
 <head>
     <meta charset="UTF-8">
@@ -81,6 +81,30 @@
         .navbar .container-fluid {
             padding-left: 5px !important;
             padding-right: 5px !important;
+        }
+    }
+    /* Карточки на главной - компактнее */
+    .card .card-body {
+        padding: 1rem 0.75rem;
+    }
+    .card-title {
+        font-size: 0.7rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    .card .h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    .card small {
+        font-size: 0.7rem;
+    }
+    @media (max-width: 576px) {
+        .card .h3 {
+            font-size: 1.2rem;
+        }
+        .card .card-body {
+            padding: 0.75rem 0.5rem;
         }
     }
 </style>
