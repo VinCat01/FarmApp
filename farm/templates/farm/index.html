@@ -30,7 +30,7 @@
 
 <!-- Финансовые карточки (только для менеджеров и админов) -->
 {% if is_manager or is_admin_role %}
-<div class="row row-cols-2 row-cols-lg-4 g-3 mb-4 align-items-stretch">
+<div class="row row-cols-2 row-cols-lg-4 g-3 mb-4 align-items-stretch w-100" >
     <div class="col">
         <a href="{% url 'farm:sale_order_list' %}" class="text-decoration-none">
             <div class="card h-100 shadow-sm border-info border-start border-4">
@@ -81,7 +81,7 @@
 {% endif %}
 
 <!-- Быстрые ссылки -->
-<div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-4 w-100" >
     <!-- Рабочие операции (Dropdown) -->
     <div class="col-md-4">
         <div class="dropdown">
