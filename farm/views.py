@@ -15,6 +15,7 @@ from farm.models import (
     WorkLog, Purchase, SaleOrder, ActionLog
 )
 from users.decorators import role_required
+from farm.log_utils import log_action
 
 
 @login_required
@@ -88,7 +89,7 @@ def work_log_create(request):
             log = form.save(commit=False)
             log.user = request.user
             log.save()
-            return redirect("work_log_list")
+            return redirect("farm:work_log_list")
     else:
         form = WorkLogForm()
     return render(request, "farm/work_log_form.html", {"form": form, "title": "Новая запись"})
@@ -103,7 +104,7 @@ def harvest_create(request):
             log.user = request.user
             log.action_type = "harvesting"
             log.save()
-            return redirect("work_log_list")
+            return redirect("farm:work_log_list")
     else:
         form = HarvestForm()
     return render(request, "farm/harvest_form.html", {"form": form, "title": "Сбор урожая"})
@@ -126,7 +127,7 @@ def vet_plan_create(request):
             plan = form.save(commit=False)
             plan.created_by = request.user
             plan.save()
-            return redirect("vet_plan_list")
+            return redirect("farm:vet_plan_list")
     else:
         form = VetPlanForm()
     return render(request, "farm/vet_plan_form.html", {"form": form, "title": "Новый вет. план"})
@@ -135,13 +136,54 @@ def vet_plan_create(request):
 @role_required("manager", "admin")
 def vet_plan_detail(request, pk):
     plan = get_object_or_404(VetPlan, pk=pk)
-    return render(request, "farm/vet_plan_detail.html", {"plan": plan})
 
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "change_status":
+            new_status = request.POST.get("status")
+            if new_status in dict(VetPlan.STATUS_CHOICES):
+                plan.status = new_status
+                plan.save()
+                messages.success(request, f"Status changed to {plan.get_status_display()}.")
+                log_action(request.user, "update", "VetPlan", plan.pk, str(plan), f"Status changed to {new_status}")
+            return redirect("farm:vet_plan_detail", pk=plan.pk)
+
+        elif action == "complete_and_log":
+            description = request.POST.get("description", "")
+            cost = request.POST.get("cost", 0)
+            try:
+                cost = Decimal(str(cost).replace(",", "."))
+            except Exception:
+                cost = Decimal("0")
+
+            plan.status = "completed"
+            if description:
+                plan.description = description
+            if cost:
+                plan.estimated_cost = cost
+            plan.save()
+
+            WorkLog.objects.create(
+                user=request.user,
+                action_type="treatment",
+                target_type="VetPlan",
+                target_id=plan.pk,
+                target_repr=plan.title,
+                description=description or f"Completed plan: {plan.title}",
+            )
+
+            messages.success(request, f"Plan '{plan.title}' completed and added to work log.")
+            log_action(request.user, "complete", "VetPlan", plan.pk, str(plan), "Plan completed with work log entry")
+            return redirect("farm:vet_plan_detail", pk=plan.pk)
+
+    return render(request, "farm/vet_plan_detail.html", {"plan": plan, "today": timezone.now().date()})
 
 @role_required("manager", "admin")
 def crop_rotation_list(request):
-    rotations = CropRotation.objects.select_related("field", "crop").all()
-    return render(request, "farm/crop_rotation_list.html", {"rotations": rotations})
+    fields = Field.objects.prefetch_related("crops__crop").all()
+    today = timezone.now().date()
+    return render(request, "farm/crop_rotation_list.html", {"fields": fields, "today": today})
 
 
 @role_required("manager", "admin")
@@ -150,10 +192,29 @@ def crop_rotation_create(request):
         form = CropRotationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("crop_rotation_list")
+            return redirect("farm:crop_rotation_list")
     else:
         form = CropRotationForm()
     return render(request, "farm/crop_rotation_form.html", {"form": form, "title": "Новый севооборот"})
+
+
+@role_required("manager", "admin")
+def crop_rotation_complete(request, pk):
+    rotation = get_object_or_404(CropRotation, pk=pk)
+    if request.method == "POST":
+        rotation.field.status = "free"
+        rotation.field.save()
+        rotation.delete()
+        messages.success(request, f"Harvest completed for {rotation.crop.name} on field {rotation.field.cadastral_number}.")
+        WorkLog.objects.create(
+            user=request.user,
+            action_type="harvesting",
+            target_type="CropRotation",
+            target_id=pk,
+            target_repr=f"{rotation.crop.name} @ {rotation.field.cadastral_number}",
+            description=f"Harvest completed: {rotation.crop.name} from field {rotation.field.cadastral_number}",
+        )
+    return redirect("farm:crop_rotation_list")
 
 
 @role_required("manager", "admin")
@@ -165,15 +226,36 @@ def purchase_list(request):
 @role_required("manager", "admin")
 def purchase_create(request):
     if request.method == "POST":
-        form = PurchaseForm(request.POST)
+        post_data = request.POST.copy()
+
+        new_item_name = post_data.get("new_item_name", "").strip()
+        if new_item_name:
+            new_item_type = post_data.get("new_item_type", "other")
+            new_item_unit = post_data.get("new_item_unit", "kg").strip()
+            new_storage = Storage.objects.create(
+                name=new_item_name,
+                item_type=new_item_type,
+                quantity=0,
+                unit=new_item_unit if new_item_unit else "kg",
+            )
+            post_data["item"] = new_storage.pk
+
+        form = PurchaseForm(post_data)
         if form.is_valid():
             purchase = form.save(commit=False)
             purchase.purchased_by = request.user
+
+            item = purchase.item
+            item.quantity = (item.quantity or 0) + purchase.quantity
+            item.save()
+
             purchase.save()
-            return redirect("purchase_list")
+            messages.success(request, f"Purchase created: {purchase.item.name} x{purchase.quantity}")
+            log_action(request.user, "create", "Purchase", purchase.pk, str(purchase), f"Purchased {purchase.quantity} of {purchase.item.name}")
+            return redirect("farm:purchase_list")
     else:
         form = PurchaseForm()
-    return render(request, "farm/purchase_form.html", {"form": form, "title": "Новая закупка"})
+    return render(request, "farm/purchase_form.html", {"form": form, "title": "New Purchase"})
 
 
 @role_required("manager", "admin")
@@ -279,3 +361,9 @@ def profit_report(request):
         "sales_count": sales.count(),
     }
     return render(request, "farm/profit_report.html", context)
+
+
+
+
+
+

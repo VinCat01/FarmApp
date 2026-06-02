@@ -1,4 +1,4 @@
-from django.urls import path
+﻿from django.urls import path
 from . import views
 
 app_name = "farm"
@@ -19,5 +19,6 @@ urlpatterns = [
     path("sales/create/", views.sale_order_create, name="sale_order_create"),
     path("sales/<int:pk>/edit/", views.sale_order_edit, name="sale_order_edit"),
     path("sales/<int:pk>/status/", views.sale_order_update_status, name="sale_order_update_status"),
+    path("crop-rotation/<int:pk>/complete/", views.crop_rotation_complete, name="crop_rotation_complete"),
     path("profit-report/", views.profit_report, name="profit_report"),
 ]
